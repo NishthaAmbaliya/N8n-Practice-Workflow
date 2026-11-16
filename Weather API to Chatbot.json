@@ -1,0 +1,122 @@
+{
+  "name": "Weather API to Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "54e6fccd-293c-4965-a592-a8fd447338ef",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=22&longitude=79&daily=wind_speed_10m_max&hourly=wind_speed_10m,wind_direction_10m&current=wind_speed_10m&timezone=Asia%2FBangkok",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2e889113-61ee-4b08-99e5-fff6cbaa513c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst currentWindSpeed = data.current?.wind_speed_10m;\nconst maxWindSpeed = data.daily?.wind_speed_10m_max?.[0];\n\nreturn [\n  {\n    json: {\n      latitude: data.latitude,\n      longitude: data.longitude,\n      timezone: data.timezone,\n\n      current_wind_speed: `${currentWindSpeed} km/h`,\n\n      maximum_wind_speed_today: `${maxWindSpeed} km/h`,\n\n      summary: `Current wind speed is ${currentWindSpeed} km/h and today's maximum wind speed is ${maxWindSpeed} km/h.`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "b916aca0-9d91-4a05-8a82-e50562171036",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Code in JavaScript').item.json.summary }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        704,
+        0
+      ],
+      "id": "a131bc23-1783-4cf1-90eb-d5a3018f2be3",
+      "name": "Send a text message",
+      "webhookId": "a03bf995-f6bb-445d-ab21-44411fe1a1d7",
+      "credentials": {
+        "telegramApi": {
+          "id": "7I5JOZnvEZiacYKn",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2d4777da-f266-4618-9a50-9b9589733404",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "865c5c71a773e5852f7be614c2e62f320e2af82f4aecae545cb820b0104d28b9"
+  },
+  "nodeGroups": [],
+  "id": "Oqs4qG7WSQzSeIPz",
+  "tags": []
+}
