@@ -1,0 +1,174 @@
+{
+  "name": "if-else Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9114464c-72f6-42e9-bb35-df7a603eff16",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0441bf2b-35e8-49bb-8929-504cd1cf600c",
+              "name": "Customer",
+              "value": "Nishtha",
+              "type": "string"
+            },
+            {
+              "id": "bfc0c3bf-b717-4018-b6fb-8449cbfefee4",
+              "name": "OrderStatus",
+              "value": "Shipped",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "10be05a4-8819-4b9d-bbc7-68c8c67d0491",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2999d80e-f47e-4cd7-be76-b2b63d75da12",
+              "leftValue": "={{$json.orderStatus}}",
+              "rightValue": "shipped",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "8a99e23c-39b6-4911-964f-657fe6a86154",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8a942759-5365-41d1-af07-17060e2b394b",
+              "name": "message ",
+              "value": "=Your order has been shipped!",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "b5ba9276-ddc6-40da-8e1d-55e681dc7a41",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        96
+      ],
+      "id": "9f443775-13e2-45eb-8966-3056f8264482",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "42eff2c9-7772-4dfd-81ea-39609bb6a9fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "865c5c71a773e5852f7be614c2e62f320e2af82f4aecae545cb820b0104d28b9"
+  },
+  "nodeGroups": [],
+  "id": "X1VoQfsFO2ZwEsK3",
+  "tags": []
+}
