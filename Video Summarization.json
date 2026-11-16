@@ -1,0 +1,192 @@
+{
+  "name": "Video Summarization",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "YouTube Video Summarizer (Gemini Edition)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "YouTube URL",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2edd3d22-b6c8-4475-b2d9-7c94d7b290aa",
+      "name": "On form submission",
+      "webhookId": "cef36064-82d9-49b6-8e45-3c56a2d86e06"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first()?.json || {};\n\nconsole.log(\"Form data:\", data);\n\n// Get the YouTube URL\nconst rawUrl =\n  data.youtube_url ||\n  data[\"YouTube URL\"] ||\n  data.url ||\n  \"\";\n\n// Check if URL was received\nif (!rawUrl) {\n  throw new Error(\n    \"YouTube URL was not received from the form. Check the Form Trigger Field Name.\"\n  );\n}\n\nconst url = String(rawUrl).trim();\n\nlet videoId = null;\n\n// Normal YouTube URL\nconst watchMatch = url.match(\n  /(?:youtube\\.com\\/watch\\?v=)([a-zA-Z0-9_-]{11})/\n);\n\n// Short YouTube URL\nconst shortMatch = url.match(\n  /(?:youtu\\.be\\/)([a-zA-Z0-9_-]{11})/\n);\n\n// Embedded YouTube URL\nconst embedMatch = url.match(\n  /(?:youtube\\.com\\/embed\\/)([a-zA-Z0-9_-]{11})/\n);\n\nvideoId =\n  watchMatch?.[1] ||\n  shortMatch?.[1] ||\n  embedMatch?.[1] ||\n  null;\n\nif (!videoId) {\n  throw new Error(`Invalid YouTube URL provided: \"${url}\"`);\n}\n\nreturn [\n  {\n    json: {\n      videoId: videoId,\n      originalUrl: url\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4ad988cd-d805-496c-ac72-9760298e4de0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.youtubetranscript.dev/api/v2/transcribe",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer yt_sk_live_b1OpkDVFYXw9VaN7BctgSdk3xJ5fIfkK\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video\": \"{{ $json.videoId }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "891561ab-6bb8-4841-82d8-ccb2aea1e82a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        672,
+        176
+      ],
+      "id": "3507837c-0ed4-4ba9-98ec-dc00e81dba8f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "uEjnmfTTST12hMqR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert YouTube video summarizer.\n\nSummarize the following YouTube video transcript.\n\nGive the answer in this format:\n\n## Final Summary\nGive a short 2-3 sentence conclusion.\n\nVideo Transcript:\n{{ $json.transcriptText }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert video summarizer.  Provide: 1. High-level executive summary 2. Key takeaways 3. Structured bullet points  Summarize the following video transcript:    {{ $json.data.transcript.text }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        592,
+        0
+      ],
+      "id": "77b05fc7-19f8-4f99-a193-b3c0c05c498b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "YouTube Video Summary",
+        "completionMessage": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        944,
+        0
+      ],
+      "id": "378b5d85-ec05-42db-97bd-4e6d0fa491ce",
+      "name": "Form",
+      "webhookId": "75c40189-30bf-4320-93f3-9fa470f299f1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c8c627bc-eac9-4cf1-9f83-6860fbfc17eb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9050deb486d3054ee220043380697db3c42760d51f49ecd90e97065e0343917b"
+  },
+  "id": "LFYoGR0n57RokkPs",
+  "tags": []
+}
