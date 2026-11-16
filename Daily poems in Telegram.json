@@ -1,0 +1,97 @@
+{
+  "name": "Daily poems in Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "7406842646",
+        "text": "=📖 Poem of the Day \n tittle: {{ $json['0'].title }}\n Author : {{ $json['0'].author }}\nPoem  : {{ $json[0].lines.join('\\n') }}",
+        "additionalFields": {}
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        448,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "2181b8c3-e937-464d-9832-c775eaa3720d",
+      "webhookId": "a1ab6d7f-32bf-438b-9d19-ebfb7665cde9",
+      "credentials": {
+        "telegramApi": {
+          "id": "BwovYr8wwJ3PjjiP",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://poetrydb.org/random",
+        "options": {}
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        208,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "a3bd8fc2-55ea-4a84-85fd-d711f1dcb78b"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d81b189c-d6e9-4810-89ce-f36978a8f389",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "02ff96a6-b4f8-4b3d-8998-cc6e35667df3",
+  "meta": {
+    "instanceId": "9050deb486d3054ee220043380697db3c42760d51f49ecd90e97065e0343917b"
+  },
+  "id": "qRnw8HQk7iUfZWSv",
+  "tags": []
+}
