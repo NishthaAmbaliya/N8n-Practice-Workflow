@@ -1,0 +1,127 @@
+{
+  "name": "RSS Read WorkFlow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d47bf0af-7eab-4805-bf28-564a5352d398",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.nasa.gov/rss/dyn/breaking_news.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "8550064f-7cc1-4a2e-acc9-1d389dea6b4b",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6d477f2-0a34-4043-aa73-f102bec80a75",
+              "name": "title",
+              "value": "APOD: 2026 August 22 – Mostly Perseids",
+              "type": "string"
+            },
+            {
+              "id": "5d1d5f62-f165-41d1-8846-6b611a16a8c2",
+              "name": "link",
+              "value": "https://science.nasa.gov/image-article/apod/apod-2026-august-22-mostly-perseids/",
+              "type": "string"
+            },
+            {
+              "id": "5d0b7906-3ddb-4018-849a-46a5a1b7c7a9",
+              "name": "pubDate",
+              "value": "Sat, 22 Aug 2026 04:05:00 +0000",
+              "type": "string"
+            },
+            {
+              "id": "783aa7ee-ae07-4891-a7f0-9c6c607cc08f",
+              "name": "content:encoded",
+              "value": "<div id=\"\" class=\"hds-module hds-module-full alignfull wp-block-nasa-blocks-secondary-navigation\">\\n<div class=\"hds-secondary-navigation-wrapper z-top width-100 padding-0\">\\n<div id=\"\" class=\"hds-secondary-navigation width-full border-bottom-1px text-center hds-color-mode-dark hds-module hds-module-full alignfull wp-block-nasa-blocks-hdsnav\"><button type=\"button\" class=\"hds-secondary-nav-mobile-button display-flex tablet:display-flex desktop:display-none width-full flex-align-center bg-carbon-90 border-color-carbon-80 color-spacesuit-white\" aria-expanded=\"false\" aria-controls=\"hds-secondary-nav-...",
+              "type": "string"
+            },
+            {
+              "id": "3ca96cca-5044-4e6a-acb1-026d7039cdfc",
+              "name": "content:encodedSnippet",
+              "value": "APOD\\n\\nScience\\nAPOD\\nAPOD: 2026 August 22…\\nToday’s APOD\\nArchive\\nSubmissions\\nIndex\\nSearch\\nCalendar\\nRSS\\nEducation\\nAbout\\nDiscuss\\n \\n\\n\\n\\n\\n\\n\\nAPOD\\nAstronomy Picture of the Day\\nDiscover the cosmos! Each day a different image or photograph of our fascinating universe is featured, along with a brief explanation written by a professional astronomer. \\n\\n\\n\\n\\nMostly Perseids\\nExplanation: Recorded the night of August 12-13, images from four dedicated meteor-monitoring cameras at an astronomical observatory in Czechia were aligned and combined to create this all-night, all-sky view. On that night, the total coun...",
+              "type": "string"
+            },
+            {
+              "id": "ff52a7e8-6e2f-433d-9590-9dfbd423ab55",
+              "name": "content",
+              "value": "APOD Science APOD APOD: 2026 August 22… Today’s APOD Archive Submissions Index Search Calendar RSS Education About Discuss   APOD Astronomy Picture of the Day Discover the cosmos! Each day a different image or photograph of our fascinating universe is featured, along with a brief explanation written by a professional astronomer. Mostly Perseids Explanation: Recorded [&#8230;]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        0
+      ],
+      "id": "9ee9031d-2e8f-4ebd-9d41-ae719c685a93",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9bc1ae76-74a9-4a89-a1d7-fa99f5aa97df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "865c5c71a773e5852f7be614c2e62f320e2af82f4aecae545cb820b0104d28b9"
+  },
+  "nodeGroups": [],
+  "id": "Kr0z8nwDSPkt5Jlm",
+  "tags": []
+}
