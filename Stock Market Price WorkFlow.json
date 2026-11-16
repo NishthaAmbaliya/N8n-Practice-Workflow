@@ -1,0 +1,188 @@
+{
+  "name": "Stock Market Price WorkFlow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 10,
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13d6b019-3cc7-4e59-8bbc-8833959002d2",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://financialmodelingprep.com/stable/quote",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "symbol",
+              "value": "AAPL"
+            },
+            {
+              "name": "apikey",
+              "value": "BOY0yF89c94HDEvSZt3V77ArAiUQ9t17"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e768fbf4-bcf0-47ff-b812-ff86ab8a2b19",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const currentPrice = Number($json.price);\nconst targetThreshold = 350;\n\nconst alertTriggered = currentPrice < targetThreshold;\n\nreturn [\n  {\n    json: {\n      symbol: $json.symbol,\n      currentPrice: currentPrice,\n      targetThreshold: targetThreshold,\n      condition: \"BELOW\",\n      alertTriggered: alertTriggered,\n      timestamp: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "937034be-188b-466d-9caf-6f49bfc90346",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eb2983a9-1095-4f82-bc20-32b0e82ba1a5",
+              "leftValue": "={{ $json.alertTriggered }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8d55a3d7-8e05-46fa-aa36-72d5f63487cc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "7406842646",
+        "text": "=*Symbol:* {{ $json.symbol }}\n*Current Price:* ${{ $json.currentPrice }}\n*Target Threshold:* ${{ $json.targetThreshold }}\n*Timestamp:* {{ $json.timestamp }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        -144
+      ],
+      "id": "bb25744e-0b83-46f5-98fa-fe2c21c1815b",
+      "name": "Send a text message",
+      "webhookId": "63e58478-96df-4487-9aa2-6cbd70e376d0",
+      "credentials": {
+        "telegramApi": {
+          "id": "BwovYr8wwJ3PjjiP",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dcd0f185-3480-4d8e-9c03-88a3cfea6d8d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9050deb486d3054ee220043380697db3c42760d51f49ecd90e97065e0343917b"
+  },
+  "id": "1rRgdASDmfSnfOM3",
+  "tags": []
+}
